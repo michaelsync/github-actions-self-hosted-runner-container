@@ -38,13 +38,69 @@ https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure
 There are currently 3 options for running the self-hosted runners. We will also consider the pipeline that requires the linux OS or the Windows. 
 
 1. **VM Runner** - Install the Github Action Runner on VM directly and run the workflow on VM
-2. **VM Runner** + Step Docker - Install the Github Action Runner on VM directly, run the workflow in the docker container for each step
+2. **VM Runner + Step Docker** - Install the Github Action Runner on VM directly, run the workflow in the docker container for each step
 3. **Docker Container Runner** - Install the Github action run on the container, register it and run the workflow on the container
-   * Windows Server 2016 LTSC (Long Term Servicing Channel) Ver 1607, Build 14393, Container Service - Windows container
-   * Windows Server 2019 LTSC Ver 1809, Build 17763 + WSL1 (Optional) + Hyper-V + LCOW for both linux container + windows container
-   * Windows 10 + Container Service + Docker Desktop for Windows for windows container
-   * Windows 10 + Docker Desktop + WSL2 + Hyper-V for linux container
+   * Windows Server 2016 LTSC (Long Term Servicing Channel Ver 1607 Build 14393) +  Container Service = Windows container
+   * Windows Server 2019 LTSC Ver 1809, Build 17763 + WSL1 (Optional) + Hyper-V + LCOW = both linux container + windows container
+   * Windows 10 + Container Service + Docker Desktop for Windows = windows container
+   * Windows 10 + Docker Desktop + WSL2 + Hyper-V = linux container
 
 # VM Runner
+
+### Advantage
+
+* Easy to install
+* The workflow can be written in a common way and we can easily switch the runner by changing the label. Here is a common way to checkout the code, setup the dotnet, build the project.
+
+   ```steps:
+      - uses: actions/checkout@main
+      - uses: actions/setup-dotnet@v1
+      with:
+         dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
+      - run: dotnet build <my project>
+
+### Disadvantage
+
+* The developer can install anything that they want to the VM and it might mess up the environment.
+* It won't be a clean and isolated state. Please refer the Best practice section above.
+
+# VM Runner + Step Docker
+
+### Advantage
+
+* Clean because we will install, run from the container. We can delete that container at the end of execution.
+* Isolated - As it's running within the container, it won't affect other pipeline.
+  
+### Disadvantage
+
+* We can't write the workflow in a common way. 
+Here is how a normal workflow looks like.
+
+   ```steps:
+         - uses: actions/checkout@main
+         - uses: actions/setup-dotnet@v1
+         with:
+            dotnet-version: '3.1.x' # SDK Version to use; x will use the latest version of the 3.1 channel
+         - run: dotnet build <my project>
+   ```
+   Here is how we need to write if we are using 
+
+   ```
+    - name: Checkout
+        uses: actions/checkout@v2      
+      - name: DotNet Build/Run
+        run: |
+               docker run --name docker-name --network=host -td mcr.microsoft.com/dotnet/sdk:3.1 
+
+               docker cp C:\repos\yourrepo docker-name:/tmp/ProjectFolder
+               
+               docker exec docker-name sh -c 'rm -r /tmp/ProjectFolder'
+               
+               docker exec docker-name sh -c 'dotnet restore /tmp/ProjectFolder/'
+               
+               docker exec docker-name sh -c 'dotnet build /tmp/ProjectFolder/'
+   ```
+
+* ss
 
 
