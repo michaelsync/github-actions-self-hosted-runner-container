@@ -37,9 +37,9 @@ https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure
 
 There are currently 3 options for running the self-hosted runners. We will also consider the pipeline that requires the linux OS or the Windows. 
 
-1. VM Runner - Install the Github Action Runner on VM directly and run the workflow on VM
-2. VM Runner + Step Docker - Install the Github Action Runner on VM directly, run the workflow in the docker container for each step
-3. Docker Container Runner - Install the Github action run on the container, register it and run the workflow on the container
+1. *VM Runner* - Install the Github Action Runner on VM directly and run the workflow on VM
+2. *VM Runner* + Step Docker - Install the Github Action Runner on VM directly, run the workflow in the docker container for each step
+3. *Docker Container Runner* - Install the Github action run on the container, register it and run the workflow on the container
    * Windows Server 2016 LTSC (Long Term Servicing Channel) Ver 1607, Build 14393, Container Service - Windows container
    * Windows Server 2019 LTSC Ver 1809, Build 17763 + WSL1 (Optional) + Hyper-V + LCOW for both linux container + windows container
    * Windows 10 + Container Service + Docker Desktop for Windows for windows container
